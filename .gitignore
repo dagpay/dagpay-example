@@ -1,0 +1,29 @@
+# Generated build files
+build/
+
+# .env file
+.env
+
+# Key files
+keys/
+
+# Installed NPM dependencies
+node_modules/
+
+# Logs
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Yarn Integrity file
+.yarn-integrity
+
+# VSCode files
+.vscode/*
+
+# Local configuration
+config/local.json
+
+# Generated coverage report
+coverage/

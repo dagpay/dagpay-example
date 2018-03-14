@@ -1,1 +1,1 @@
-# dagpay-example
+# Dagpay example
