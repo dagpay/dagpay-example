@@ -1,5 +1,6 @@
 const axios = require("axios");
 const express = require("express");
+const session = require("express-session");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
 const http = require("http");
@@ -28,6 +29,13 @@ const config = {
 // create the express server application
 const app = express();
 
+// enable session support
+app.use(
+  session({
+    secret: "ASDFS2342JGAJ342DE2SAAL52HASM34J"
+  })
+);
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -54,6 +62,9 @@ app.get("/", (request, response, next) => {
   `);
 });
 
+// represents a "database" where the key is the invoice id and value is invoice info
+const invoices = {};
+
 // handle the "Pay with dagcoin" form POST request
 app.post("/buy", async (request, response, next) => {
   // extract form info
@@ -66,7 +77,7 @@ app.post("/buy", async (request, response, next) => {
     currencyAmount: parseFloat(currencyAmount),
     currency: "DAG",
     description,
-    data: '{"sessionId": "foobar"}',
+    data: JSON.stringify({ sessionId: request.session.id }),
     paymentId: "foobar",
     date: new Date().toISOString(),
     nonce: getRandomString(32)
@@ -95,6 +106,12 @@ app.post("/buy", async (request, response, next) => {
 
     // show invoice info in the console
     console.log("invoice", invoice);
+
+    // "save" the invoice so we can get it by id later
+    invoices[invoice.id] = invoice;
+
+    // store the last created invoice id in user session
+    request.session.invoiceId = invoice.id;
 
     // redirect the user to invoice.paymentUrl
     response.redirect(invoice.paymentUrl);
@@ -134,6 +151,27 @@ app.post("/status", (request, response, next) => {
 
   // handle valid invoice update info
   console.log("got valid status update", invoice);
+
+  // "update" the invoice info (the info for this will be shown for /result)
+  invoices[invoice.id] = invoice;
+});
+
+// handle the result redirect
+app.get("/result", (request, response, next) => {
+  const invoiceId = request.session.invoiceId;
+
+  if (!invoiceId) {
+    response.status(404).send("no invoice has been created");
+
+    return;
+  }
+
+  const invoice = invoices[invoiceId];
+
+  // send the invoice info
+  response.send({
+    invoice
+  });
 });
 
 // create either http or https server depending on SSL configuration
