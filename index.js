@@ -48,7 +48,7 @@ app.use(bodyParser.json());
 // handle index request
 app.get("/", (request, response, next) => {
   response.send(`
-    <h1>Example Dagpay merchant application</h1>
+    <h1>Example Dagpay application</h1>
 
     <h2>Shop</h2>
     <form action="/buy" method="post"
@@ -125,7 +125,7 @@ app.post("/buy", async (request, response, next) => {
   } catch (e) {
     // show error view (you'll get here when trying to make an invoice with negative amount etc)
     response.status(403).send(`
-      <h1>Example Dagpay merchant application</h1>
+      <h1>Example Dagpay application</h1>
 
       <h2>Creating invoice failed [${e.response.status}]</h2>
       <p>
@@ -187,7 +187,7 @@ app.get("/result", (request, response, next) => {
 
   // show the invoice info
   response.send(`
-    <h1>Example Dagpay merchant application</h1>
+    <h1>Example Dagpay application</h1>
 
     <h2>Invoice result</h2>
     <p>
