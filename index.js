@@ -59,10 +59,12 @@ app.get("/", (request, response, next) => {
         <input type="submit" value="Pay with Dagcoin"/>
       </p>
     </form>
+
+    <p><em><a href="https://github.com/dagcoin/dagpay-example" target="_blank">https://github.com/dagcoin/dagpay-example</a></em></p>
   `);
 });
 
-// represents a "database" where the key is the invoice id and value is invoice info
+// represents invoice "database" where the key is the invoice id and value is invoice info
 const invoices = {};
 
 // handle the "Pay with dagcoin" form POST request
@@ -89,7 +91,7 @@ app.post("/buy", async (request, response, next) => {
     config.dagpay.secret
   );
 
-  // add the signature to invoice info
+  // add the signature to build the create invoice info
   const createInvoiceRequestInfo = {
     ...invoiceSignatureInfo,
     signature
@@ -105,22 +107,29 @@ app.post("/buy", async (request, response, next) => {
     const invoice = result.data.payload;
 
     // show invoice info in the console
-    console.log("invoice", invoice);
+    console.log("created invoice", invoice);
 
-    // "save" the invoice so we can get it by id later
+    // "save" the invoice so we can get it by id later (you'd normally use a database)
     invoices[invoice.id] = invoice;
 
-    // store the last created invoice id in user session
+    // store the last created invoice id in user session so we know which one we're working with
     request.session.invoiceId = invoice.id;
 
-    // redirect the user to invoice.paymentUrl
+    // redirect the user to payment view
     response.redirect(invoice.paymentUrl);
   } catch (e) {
-    response.status(500).send({
-      message: e.message,
-      status: e.response.status,
-      data: e.response.data
-    });
+    // show error view (you'll get here when trying to make an invoice with negative amount etc)
+    response.status(403).send(`
+      <h1>Example Dagpay merchant application</h1>
+
+      <h2>Creating invoice failed [${e.response.status}]</h2>
+      <p>
+        <strong>${e.message}</strong>
+      </p>
+      <p>
+        <pre>${JSON.stringify(e.response.data, undefined, "  ")}</pre>
+      </p>
+    `);
   }
 });
 
@@ -149,29 +158,47 @@ app.post("/status", (request, response, next) => {
     return;
   }
 
-  // handle valid invoice update info
-  console.log("got valid status update", invoice);
+  // log valid invoice update info
+  console.log("got valid invoice status update", invoice);
 
-  // "update" the invoice info (the info for this will be shown for /result)
+  // "update" the invoice info
   invoices[invoice.id] = invoice;
 });
 
 // handle the result redirect
 app.get("/result", (request, response, next) => {
+  // get the created invoice id from the session
   const invoiceId = request.session.invoiceId;
 
+  // show a message if there's no invoice id available
   if (!invoiceId) {
-    response.status(404).send("no invoice has been created");
+    response.status(404).send("No invoice has been created");
 
     return;
   }
 
+  // get the invoice info
   const invoice = invoices[invoiceId];
 
-  // send the invoice info
-  response.send({
-    invoice
-  });
+  // show the invoice info
+  response.send(`
+    <h1>Example Dagpay merchant application</h1>
+
+    <h2>Invoice result</h2>
+    <p>
+      <strong>Amount:</strong> ${invoice.currencyAmount} ${invoice.currency}
+      (${invoice.coinAmount} DAG)
+    </p>
+    <p>
+      <strong>Description:</strong> ${invoice.description}
+    </p>
+    <p>
+      <strong>State:</strong> ${invoice.state}
+    </p>
+    <p>
+      <pre>${JSON.stringify(invoice, undefined, "  ")}</pre>
+    </p>
+  `);
 });
 
 // create either http or https server depending on SSL configuration
