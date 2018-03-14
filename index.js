@@ -29,6 +29,9 @@ const config = {
 // create the express server application
 const app = express();
 
+// represents invoice "database" where the key is the invoice id and value is invoice info
+const invoices = {};
+
 // enable session support
 app.use(
   session({
@@ -68,9 +71,6 @@ app.get("/", (request, response, next) => {
     </p>
   `);
 });
-
-// represents invoice "database" where the key is the invoice id and value is invoice info
-const invoices = {};
 
 // handle the "Pay with dagcoin" form POST request
 app.post("/buy", async (request, response, next) => {
@@ -202,6 +202,9 @@ app.get("/result", (request, response, next) => {
     </p>
     <p>
       <pre>${JSON.stringify(invoice, undefined, "  ")}</pre>
+    </p>
+    <p>
+      <a href="/">Back to index</a>
     </p>
   `);
 });
