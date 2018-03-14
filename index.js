@@ -160,6 +160,15 @@ server.listen(config.server.port, () => {
   console.log(`server started on port ${config.server.port}`);
 });
 
+// also start a http server to redirect to https if ssl is enabled
+if (config.server.https.enabled) {
+  express()
+    .use((request, response, _next) => {
+      response.redirect(`https://${request.hostname}${request.originalUrl}`);
+    })
+    .listen(80);
+}
+
 // returns signature for creating an invoice
 function getCreateInvoiceSignature(info, secret) {
   const separator = ":";
