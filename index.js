@@ -60,7 +60,12 @@ app.get("/", (request, response, next) => {
       </p>
     </form>
 
-    <p><em><a href="https://github.com/dagcoin/dagpay-example" target="_blank">https://github.com/dagcoin/dagpay-example</a></em></p>
+    <p>
+      Github: <a href="https://github.com/dagcoin/dagpay-example" target="_blank">https://github.com/dagcoin/dagpay-example</a>
+    </p>
+    <p>
+      Documentation: <a href="https://test.dagpay.io/public/documentation" target="_blank">https://test.dagpay.io/public/documentation</a>
+    </p>
   `);
 });
 
