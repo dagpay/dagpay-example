@@ -2,6 +2,9 @@ const axios = require("axios");
 const express = require("express");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
+const http = require("http");
+const https = require("https");
+const fs = require("fs");
 
 // load the .env configuration (https://github.com/motdotla/dotenv)
 require("dotenv").config();
@@ -9,7 +12,10 @@ require("dotenv").config();
 // build the configuration from .env file
 const config = {
   server: {
-    port: process.env.SERVER_PORT
+    port: process.env.SERVER_PORT,
+    useSSL: process.env.SERVER_USE_SSL === "true",
+    cert: process.env.SERVER_CERT,
+    key: process.env.SERVER_KEY
   },
   dagpay: {
     apiBaseUrl: process.env.DAGPAY_API_BASE_URL,
@@ -138,8 +144,19 @@ app.post("/status", (request, response, next) => {
   console.log("got valid status update", invoice);
 });
 
+// create either http or https server depending on SSL configuration
+const server = config.server.useSSL
+  ? https.createServer(
+      {
+        cert: fs.readFileSync(config.server.cert),
+        key: fs.readFileSync(config.server.key)
+      },
+      app
+    )
+  : http.createServer(app);
+
 // start the server
-app.listen(config.server.port, () => {
+server.listen(config.server.port, () => {
   console.log(`server started on port ${config.server.port}`);
 });
 
