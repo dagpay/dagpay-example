@@ -39,14 +39,6 @@ app.get("/", (request, response, next) => {
   response.send(`
     <h1>Example Dagpay merchant application</h1>
 
-    <h2>Configuration</h2>
-    <ul>
-      <li><strong>Api base url: </strong> ${config.dagpay.apiBaseUrl}</li>
-      <li><strong>User id: </strong> ${config.dagpay.userId}</li>
-      <li><strong>Environment id: </strong> ${config.dagpay.environmentId}</li>
-      <li><strong>Secret: </strong> ${config.dagpay.secret}</li>
-    </ul>
-
     <h2>Shop</h2>
     <form action="/buy" method="post"
       <p>
