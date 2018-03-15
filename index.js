@@ -168,6 +168,9 @@ app.post("/status", (request, response, next) => {
 
   // "update" the invoice info
   invoices[invoice.id] = invoice;
+
+  // send success response
+  response.send("OK");
 });
 
 // handle the result redirect
