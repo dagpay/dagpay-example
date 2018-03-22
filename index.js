@@ -56,6 +56,17 @@ app.get("/", (request, response, next) => {
         <label><input name="currencyAmount" value="0.1"/> Amount</label>
       </p>
       <p>
+        <label>
+          <select name="currency">
+            <option value="DAG">DAG</option>
+            <option value="BTC">BTC</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+          </select>
+          Currency
+        </label>
+      </p>
+      <p>
         <label><input name="description" value="iPhone X"/> Description</label>
       </p>
       <p>
@@ -75,17 +86,17 @@ app.get("/", (request, response, next) => {
 // handle the "Pay with dagcoin" form POST request
 app.post("/buy", async (request, response, next) => {
   // extract form info
-  const { currencyAmount, description } = request.body;
+  const { currencyAmount, currency, description } = request.body;
 
   // build the invoice signature info
   const invoiceSignatureInfo = {
     userId: config.dagpay.userId,
     environmentId: config.dagpay.environmentId,
-    currencyAmount: parseFloat(currencyAmount),
-    currency: "DAG",
+    currencyAmount: parseFloat(currencyAmount), // we're using a simple form so always getting strings
+    currency,
     description,
-    data: JSON.stringify({ sessionId: request.session.id }),
-    paymentId: "foobar",
+    data: JSON.stringify({ sessionId: request.session.id }), // not really used but just an example
+    paymentId: getRandomString(32), // usually internal payment database entry id
     date: new Date().toISOString(),
     nonce: getRandomString(32)
   };
