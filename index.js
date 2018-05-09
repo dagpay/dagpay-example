@@ -18,12 +18,29 @@ const config = {
     cert: process.env.SERVER_CERT,
     key: process.env.SERVER_KEY
   },
-  dagpay: {
-    apiBaseUrl: process.env.DAGPAY_API_BASE_URL,
-    userId: process.env.DAGPAY_USER_ID,
-    environmentId: process.env.DAGPAY_ENVIRONMENT_ID,
-    secret: process.env.DAGPAY_SECRET
-  }
+  environments: [
+    {
+      name: "Live",
+      apiBaseUrl: process.env.ENV_LIVE_API_BASE_URL,
+      userId: process.env.ENV_LIVE_USER_ID,
+      environmentId: process.env.ENV_LIVE_ENVIRONMENT_ID,
+      secret: process.env.ENV_LIVE_SECRET
+    },
+    {
+      name: "Test",
+      apiBaseUrl: process.env.ENV_TEST_API_BASE_URL,
+      userId: process.env.ENV_TEST_USER_ID,
+      environmentId: process.env.ENV_TEST_ENVIRONMENT_ID,
+      secret: process.env.ENV_TEST_SECRET
+    },
+    {
+      name: "Development",
+      apiBaseUrl: process.env.ENV_DEV_API_BASE_URL,
+      userId: process.env.ENV_DEV_USER_ID,
+      environmentId: process.env.ENV_DEV_ENVIRONMENT_ID,
+      secret: process.env.ENV_DEV_SECRET
+    }
+  ]
 };
 
 // create the express server application
@@ -35,7 +52,9 @@ const invoices = {};
 // enable session support
 app.use(
   session({
-    secret: "ASDFS2342JGAJ342DE2SAAL52HASM34J"
+    secret: "ASDFS2342JGAJ342DE2SAAL52HASM34J",
+    resave: false,
+    saveUninitialized: true
   })
 );
 
@@ -53,21 +72,42 @@ app.get("/", (request, response, next) => {
     <h2>Shop</h2>
     <form action="/buy" method="post"
       <p>
-        <label><input name="currencyAmount" value="0.1"/> Amount</label>
+        <label>
+          Amount<br/>
+          <input name="currencyAmount" value="0.1"/>
+        </label>
       </p>
       <p>
         <label>
+          Currency<br/>
           <select name="currency">
             <option value="DAG">DAG</option>
             <option value="BTC">BTC</option>
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
           </select>
-          Currency
         </label>
       </p>
       <p>
-        <label><input name="description" value="iPhone X"/> Description</label>
+        <label>
+          Description<br/>
+          <input name="description" value="iPhone X"/>
+        </label>
+      </p>
+      <p>
+        <label>
+          Environment<br/>
+          <select name="environment">
+            ${config.environments
+              .map(
+                env =>
+                  `<option value="${env.name}"${
+                    env.name === "Test" ? " selected" : ""
+                  }>${env.name} - ${env.apiBaseUrl}</option>`
+              )
+              .join("\n")}
+          </select>
+        </label>
       </p>
       <p>
         <input type="submit" value="Pay with Dagcoin"/>
@@ -86,12 +126,24 @@ app.get("/", (request, response, next) => {
 // handle the "Pay with dagcoin" form POST request
 app.post("/buy", async (request, response, next) => {
   // extract form info
-  const { currencyAmount, currency, description } = request.body;
+  const { currencyAmount, currency, description, environment } = request.body;
+
+  // find environment configuration by name
+  const environmentConfig = config.environments.find(
+    env => env.name === environment
+  );
+
+  // make sure the environment configuration exists
+  if (!environmentConfig) {
+    next(new Error(`Invalid environment "${environment}" requested`));
+
+    return;
+  }
 
   // build the invoice signature info
   const invoiceSignatureInfo = {
-    userId: config.dagpay.userId,
-    environmentId: config.dagpay.environmentId,
+    userId: environmentConfig.userId,
+    environmentId: environmentConfig.environmentId,
     currencyAmount: parseFloat(currencyAmount), // we're using a simple form so always getting strings
     currency,
     description,
@@ -104,7 +156,7 @@ app.post("/buy", async (request, response, next) => {
   // calculate the create invoice signature
   const signature = getCreateInvoiceSignature(
     invoiceSignatureInfo,
-    config.dagpay.secret
+    environmentConfig.secret
   );
 
   // add the signature to build the create invoice info
@@ -114,7 +166,7 @@ app.post("/buy", async (request, response, next) => {
   };
 
   // build create invoice API url
-  const url = `${config.dagpay.apiBaseUrl}/invoices`;
+  const url = `${environmentConfig.apiBaseUrl}/invoices`;
 
   // attempt to create the invoice
   try {

@@ -20,14 +20,30 @@ You should now be able to create invoices and pay them using the [Testnet Dag](h
 
 ### Configuration .env file contents example
 
+Replace the xxx identifiers and secrets. You don't have to configure all environments.
+
 ```
+# Server configuration
 SERVER_PORT=443
 SERVER_USE_SSL=true
 SERVER_CERT=/etc/letsencrypt/live/example.com/fullchain.pem
 SERVER_KEY=/etc/letsencrypt/live/example.com/privkey.pem
 
-DAGPAY_API_BASE_URL=https://test-api.dagpay.io/api
-DAGPAY_USER_ID=1306d6b4-7a5b-4dab-b4ee-9803f148d194
-DAGPAY_ENVIRONMENT_ID=2ede58fe-d6df-4841-b909-37622390405a
-DAGPAY_SECRET=384F2DE967EC642CA0A686FC4A9C1EA9
+# Live environment https://dagpay.io
+ENV_LIVE_API_BASE_URL=https://api.dagpay.io/api
+ENV_LIVE_USER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+ENV_LIVE_ENVIRONMENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+ENV_LIVE_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Test environment https://test.dagpay.io
+ENV_TEST_API_BASE_URL=https://test-api.dagpay.io/api
+ENV_TEST_USER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+ENV_TEST_ENVIRONMENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+ENV_TEST_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Development environment https://dev.dagpay.io
+ENV_DEV_API_BASE_URL=https://dev-api.dagpay.io/api
+ENV_DEV_USER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+ENV_DEV_ENVIRONMENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+ENV_DEV_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
