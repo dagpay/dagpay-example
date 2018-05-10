@@ -147,7 +147,7 @@ app.post("/buy", async (request, response, next) => {
     currencyAmount: parseFloat(currencyAmount), // we're using a simple form so always getting strings
     currency,
     description,
-    data: JSON.stringify({ sessionId: request.session.id }), // not really used but just an example
+    data: JSON.stringify({ environment }), // you can include arbitrary data such as session id etc
     paymentId: getRandomString(32), // usually internal payment database entry id
     date: new Date().toISOString(),
     nonce: getRandomString(32)
@@ -204,13 +204,16 @@ app.post("/buy", async (request, response, next) => {
 
 // handle the dagpay status server-to-server request (you can't test this on localhost)
 app.post("/status", (request, response, next) => {
+  // get provided info and extract environment name from the attached data
+  const invoice = request.body;
+  const environment = JSON.parse(invoice.data).environment;
+
   // find environment configuration by name
   const environmentConfig = config.environments.find(
-    env => env.name === request.session.environment
+    env => env.name === environment
   );
 
-  // get provided info and calculate the expected signature
-  const invoice = request.body;
+  // calculate the expected signature
   const providedSignature = invoice.signature;
   const expectedSignature = getInvoiceInfoSignature(
     invoice,
