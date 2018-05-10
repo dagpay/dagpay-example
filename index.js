@@ -182,6 +182,7 @@ app.post("/buy", async (request, response, next) => {
 
     // store the last created invoice id in user session so we know which one we're working with
     request.session.invoiceId = invoice.id;
+    request.session.environment = environment;
 
     // redirect the user to payment view
     response.redirect(invoice.paymentUrl);
@@ -203,12 +204,17 @@ app.post("/buy", async (request, response, next) => {
 
 // handle the dagpay status server-to-server request (you can't test this on localhost)
 app.post("/status", (request, response, next) => {
+  // find environment configuration by name
+  const environmentConfig = config.environments.find(
+    env => env.name === request.session.environment
+  );
+
   // get provided info and calculate the expected signature
   const invoice = request.body;
   const providedSignature = invoice.signature;
   const expectedSignature = getInvoiceInfoSignature(
     invoice,
-    config.dagpay.secret
+    environmentConfig.secret
   );
 
   // expect provided signature to match expected signature
