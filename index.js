@@ -99,6 +99,9 @@ app.get("/", (request, response, next) => {
           Environment<br/>
           <select name="environment">
             ${config.environments
+              .filter(
+                env => typeof env.userId === "string" && env.userId.length > 0
+              )
               .map(
                 env =>
                   `<option value="${env.name}"${

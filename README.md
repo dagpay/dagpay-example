@@ -29,21 +29,9 @@ SERVER_USE_SSL=true
 SERVER_CERT=/etc/letsencrypt/live/example.com/fullchain.pem
 SERVER_KEY=/etc/letsencrypt/live/example.com/privkey.pem
 
-# Live environment https://dagpay.io
-ENV_LIVE_API_BASE_URL=https://api.dagpay.io/api
-ENV_LIVE_USER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-ENV_LIVE_ENVIRONMENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-ENV_LIVE_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
 # Test environment https://test.dagpay.io
 ENV_TEST_API_BASE_URL=https://test-api.dagpay.io/api
 ENV_TEST_USER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ENV_TEST_ENVIRONMENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ENV_TEST_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# Development environment https://dev.dagpay.io
-ENV_DEV_API_BASE_URL=https://dev-api.dagpay.io/api
-ENV_DEV_USER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-ENV_DEV_ENVIRONMENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-ENV_DEV_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
