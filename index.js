@@ -118,10 +118,10 @@ app.get("/", (request, response, next) => {
     </form>
 
     <p>
-      Github: <a href="https://github.com/dagcoin/dagpay-example" target="_blank">https://github.com/dagcoin/dagpay-example</a>
+      Github: <a href="https://github.com/dagpay/dagpay-example" target="_blank">https://github.com/dagpay/dagpay-example</a>
     </p>
     <p>
-      Documentation: <a href="https://dagpay.io/public/documentation" target="_blank">https://dagpay.io/public/documentation</a>
+      Documentation: <a href="https://app.dagpay.io/documentation" target="_blank">https://app.dagpay.io/documentation</a>
     </p>
   `);
 });
